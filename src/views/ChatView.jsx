@@ -7,7 +7,6 @@ import {
   Clock,
   Filter,
   Globe,
-  Image as ImageIcon,
   Mic,
   MicOff,
   MoreVertical,
@@ -21,7 +20,6 @@ import {
   Smile,
   Sparkles,
   Trash2,
-  Users,
   Video,
   X,
 } from 'lucide-react';
@@ -524,7 +522,7 @@ export const ChatView = () => {
                         <div
                           className={`p-3.5 rounded-3xl shadow-sm relative text-sm ${
                             isMe
-                              ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white rounded-br-xs'
+                              ? 'bg-green-600 text-white rounded-br-xs'
                               : 'bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 rounded-bl-xs border border-slate-200/80 dark:border-slate-800/80'
                           }`}
                         >

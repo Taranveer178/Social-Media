@@ -26,17 +26,17 @@ export const BottomNav = () => {
             <button
               key={item.id}
               onClick={() => navigate(item.id)}
-              className="p-2.5 relative rounded-2xl transition-transform active:scale-90"
+              className="p-2.5 relative rounded-xl transition-colors"
             >
               {item.avatar ? (
-                <div className={`rounded-full p-0.5 transition-all ${isActive ? 'ring-2 ring-violet-500 scale-105' : ''}`}>
+                <div className={`rounded-full p-0.5 ${isActive ? 'ring-2 ring-green-600' : ''}`}>
                   <img src={item.avatar} className="w-6 h-6 rounded-full object-cover" alt="profile" />
                 </div>
               ) : (
                 <Icon
                   size={22}
-                  className={isActive ? 'text-violet-600 dark:text-violet-400 scale-110' : 'text-slate-400 dark:text-slate-500'}
-                  strokeWidth={isActive ? 2.5 : 2}
+                  className={isActive ? 'text-green-700 dark:text-green-400' : 'text-slate-400 dark:text-slate-500'}
+                  strokeWidth={isActive ? 2.25 : 1.8}
                 />
               )}
               {item.badge && (

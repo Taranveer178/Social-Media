@@ -56,10 +56,10 @@ export const DashboardView = () => {
       {/* Top Header Mobile */}
       <div className="md:hidden bg-white/90 dark:bg-slate-950/90 backdrop-blur-md p-4 sticky top-0 z-30 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-gradient-to-tr from-violet-600 to-fuchsia-500 rounded-xl flex items-center justify-center text-white">
+          <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white">
             <Activity size={18} />
           </div>
-          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-fuchsia-500">Vibely</span>
+          <span className="text-xl font-bold text-slate-900 dark:text-white">Vibely</span>
         </div>
         <div className="flex items-center space-x-1">
           <IconButton icon={Search} onClick={() => navigate('/discover')} title="Discover" />
@@ -136,19 +136,19 @@ export const DashboardView = () => {
         {/* Quick Vibe Actions */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'Chats', sub: `${chats.length} active`, icon: MessageCircle, color: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400', path: '/chats' },
-            { label: 'Circles', sub: `${circles.length} spaces`, icon: Users, color: 'bg-violet-500/10 text-violet-600 dark:text-violet-400', path: '/circles' },
-            { label: 'Mood Match', sub: `${users.length} people`, icon: Flame, color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400', path: '/discover' },
-            { label: 'Moments', sub: `${moments.length} shared`, icon: Sparkles, color: 'bg-fuchsia-500/10 text-fuchsia-600 dark:text-fuchsia-400', path: '/moments' },
+            { label: 'Chats', sub: `${chats.length} active`, icon: MessageCircle, path: '/chats' },
+            { label: 'Circles', sub: `${circles.length} spaces`, icon: Users, path: '/circles' },
+            { label: 'Mood Match', sub: `${users.length} people`, icon: Flame, path: '/discover' },
+            { label: 'Moments', sub: `${moments.length} shared`, icon: Sparkles, path: '/moments' },
           ].map((item, idx) => {
             const Icon = item.icon;
             return (
               <button
                 key={idx}
                 onClick={() => navigate(item.path)}
-                className={`p-4 rounded-3xl flex items-center space-x-3 transition-transform hover:scale-102 active:scale-95 border border-slate-100 dark:border-slate-800 ${item.color} bg-white dark:bg-slate-950 shadow-sm`}
+                className="p-4 rounded-2xl flex items-center space-x-3 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-green-300 dark:hover:border-green-800 transition-colors"
               >
-                <div className="p-3 rounded-2xl bg-current/10">
+                <div className="p-3 rounded-xl bg-green-50 dark:bg-green-950/50 text-green-700 dark:text-green-400">
                   <Icon size={22} />
                 </div>
                 <div className="text-left">
@@ -161,13 +161,13 @@ export const DashboardView = () => {
         </section>
 
         {/* Vibe Status Selector Filter */}
-        <section className="bg-gradient-to-r from-violet-600 via-fuchsia-600 to-indigo-600 p-6 rounded-3xl text-white shadow-xl shadow-violet-500/20 relative overflow-hidden">
-          <div className="relative z-10 space-y-3">
+        <section className="bg-white dark:bg-slate-950 p-5 md:p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
+          <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full backdrop-blur-md">Your Current Vibe</span>
-              <span className="text-xs font-semibold bg-white/15 px-3 py-1 rounded-full">{user?.vibe || '🔥 Focused'}</span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Your current vibe</span>
+              <span className="text-xs font-medium text-slate-700 dark:text-slate-300">{user?.vibe || '🔥 Focused'}</span>
             </div>
-            <h3 className="text-xl font-bold">What is your energy right now?</h3>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">What is your energy right now?</h3>
             <div className="flex flex-wrap gap-2 pt-2">
               {['💻 Coding', '☕ Coffee', '🎧 Music', '✈️ Travel', '🔥 Focused', '😴 Tired'].map((vibe, idx) => {
                 const isSelected = user?.vibe === vibe;
@@ -181,8 +181,8 @@ export const DashboardView = () => {
                     }
                     className={`px-3.5 py-1.5 rounded-2xl text-xs font-semibold transition-all border ${
                       isSelected
-                        ? 'bg-white text-violet-700 border-white shadow-md'
-                        : 'bg-white/10 hover:bg-white/25 backdrop-blur-md text-white border-white/20'
+                        ? 'bg-green-600 text-white border-green-600'
+                        : 'bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
                     }`}
                   >
                     {vibe}

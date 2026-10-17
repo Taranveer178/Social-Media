@@ -43,11 +43,11 @@ export const Sidebar = () => {
   return (
     <aside className="hidden md:flex flex-col w-20 lg:w-64 h-screen bg-white dark:bg-slate-950 border-r border-slate-200/80 dark:border-slate-800/80 transition-all duration-300 z-20 shrink-0">
       <div className="p-4 flex items-center justify-center lg:justify-start space-x-3 my-2 cursor-pointer" onClick={() => navigate('/')}>
-        <div className="w-10 h-10 bg-gradient-to-tr from-violet-600 via-fuchsia-500 to-amber-400 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-500/25 transition-transform hover:scale-105">
+        <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center">
           <Activity className="text-white" size={22} />
         </div>
         <div className="hidden lg:block">
-          <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-fuchsia-500 to-amber-500 tracking-tight">
+          <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
             Vibely
           </span>
           <p className="text-[10px] text-slate-400 font-medium tracking-wide">SHARE YOUR VIBE</p>
@@ -62,15 +62,15 @@ export const Sidebar = () => {
             <button
               key={item.id}
               onClick={() => navigate(item.id)}
-              className={`w-full flex items-center p-3 rounded-2xl transition-all duration-200 group
+              className={`w-full flex items-center p-3 rounded-xl transition-colors duration-150 group
                 ${isActive
-                  ? 'bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 font-semibold shadow-sm border border-violet-100 dark:border-violet-900/50'
+                  ? 'bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-400 font-semibold'
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-slate-100'
                 }
               `}
             >
               <div className="relative flex items-center justify-center lg:justify-start w-full">
-                <Icon size={22} strokeWidth={isActive ? 2.5 : 2} className="shrink-0 transition-transform group-hover:scale-110" />
+                <Icon size={21} strokeWidth={isActive ? 2.25 : 1.8} className="shrink-0" />
                 <span className="hidden lg:block ml-3.5 text-sm">{item.label}</span>
                 {item.badge && (
                   item.count ? (
