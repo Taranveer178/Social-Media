@@ -6,7 +6,6 @@ import {
   ChevronLeft,
   Clock,
   Filter,
-  Globe,
   Mic,
   MicOff,
   MoreVertical,
@@ -42,6 +41,7 @@ export const ChatView = () => {
     errors,
     refreshChats,
     refreshChatMessages,
+    watchChatMessages,
     startDirectChat,
     createGroupChat,
     sendMessage,
@@ -49,7 +49,6 @@ export const ChatView = () => {
     toggleDisappearingMessages,
     deleteChat,
     addReaction,
-    updateMessageMetadata,
     toggleSaveMessage,
     votePoll,
     setActiveCall,
@@ -66,7 +65,6 @@ export const ChatView = () => {
   const [audioSpeed, setAudioSpeed] = useState('1x');
   const [isPlayingAudio, setIsPlayingAudio] = useState({});
   const [showTranscript, setShowTranscript] = useState({});
-  const [showTranslation, setShowTranslation] = useState({});
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showChatMenu, setShowChatMenu] = useState(false);
   const [showNewChatModal, setShowNewChatModal] = useState(false);
@@ -82,6 +80,7 @@ export const ChatView = () => {
   const fileInputRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const recordingStartedAtRef = useRef(0);
   const audioPlayersRef = useRef({});
   const [isRecording, setIsRecording] = useState(false);
   const [recordingError, setRecordingError] = useState('');
@@ -97,6 +96,11 @@ export const ChatView = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [activeChat?.messages?.length]);
+
+  useEffect(() => {
+    if (!activeChatId) return undefined;
+    return watchChatMessages(activeChatId);
+  }, [activeChatId, watchChatMessages]);
 
   const filteredChats = chats.filter((chat) => {
     if (chatFilter === 'direct' && chat.isGroup) return false;
@@ -213,7 +217,15 @@ export const ChatView = () => {
     try {
       setRecordingError('');
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
+      const recordingChatId = activeChat?.id;
+      if (!recordingChatId) {
+        stream.getTracks().forEach((track) => track.stop());
+        throw new Error('Select a conversation before recording a voice message.');
+      }
+      const supportedMimeType = typeof MediaRecorder.isTypeSupported === 'function'
+        ? ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'].find((type) => MediaRecorder.isTypeSupported(type))
+        : '';
+      const recorder = new MediaRecorder(stream, supportedMimeType ? { mimeType: supportedMimeType } : undefined);
       mediaRecorderRef.current = recorder;
       audioChunksRef.current = [];
       recorder.ondataavailable = (event) => {
@@ -223,21 +235,27 @@ export const ChatView = () => {
       recorder.onstop = async () => {
         stream.getTracks().forEach((track) => track.stop());
         setIsRecording(false);
+        setIsUploadingMedia(true);
         try {
           const blob = new Blob(audioChunksRef.current, { type: recorder.mimeType || 'audio/webm' });
           if (!blob.size) throw new Error('No audio was captured.');
           const audioUrl = await uploadMedia(blob, 'audio');
-          await sendMessage(activeChat.id, '', 'voice', {
+          const durationSeconds = Math.max(1, Math.round((Date.now() - recordingStartedAtRef.current) / 1000));
+          const duration = `${Math.floor(durationSeconds / 60)}:${String(durationSeconds % 60).padStart(2, '0')}`;
+          await sendMessage(recordingChatId, '', 'voice', {
             audioUrl,
-            duration: '0:08',
+            duration,
             transcript: 'Voice note recorded via Vibely encrypted audio.',
           });
           showToast('Voice message sent! 🎙️');
         } catch (error) {
           setRecordingError(error.message);
+        } finally {
+          setIsUploadingMedia(false);
         }
       };
       recorder.start();
+      recordingStartedAtRef.current = Date.now();
       setIsRecording(true);
     } catch (error) {
       setRecordingError(error.message || 'Microphone access was denied.');
@@ -263,17 +281,8 @@ export const ChatView = () => {
     }
   };
 
-  const handleTranslateMessage = async (msg) => {
-    const currentlyShown = showTranslation[msg.id];
-    setShowTranslation((prev) => ({ ...prev, [msg.id]: !currentlyShown }));
-    if (!msg.translation && activeChat && msg.text) {
-      const generated = `[EN/HI] ${msg.text} — Translated via Vibely AI`;
-      await updateMessageMetadata(activeChat.id, msg.id, { translation: generated }).catch(() => {});
-    }
-  };
-
   return (
-    <div className="flex-1 flex h-screen bg-slate-50 dark:bg-slate-900 overflow-hidden pb-16 md:pb-0">
+    <div className="flex-1 flex h-full min-h-0 bg-slate-50 dark:bg-slate-900 overflow-hidden pb-16 md:pb-0">
       {/* Conversations Sidebar (Left) */}
       <div className={`w-full md:w-80 lg:w-96 bg-white dark:bg-slate-950 border-r border-slate-200/80 dark:border-slate-800/80 flex flex-col ${routeParams.chatId ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
@@ -513,7 +522,7 @@ export const ChatView = () => {
                   const isStarred = savedMessages.some((s) => s.id === msg.id);
 
                   return (
-                    <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} group`}>
+                    <div key={msg.id} className={`flex flex-wrap ${isMe ? 'justify-end' : 'justify-start'} group`}>
                       <div className="max-w-[82%] md:max-w-[65%] space-y-1">
                         {isGroup && !isMe && (
                           <span className="text-[10px] font-bold text-slate-400 ml-2">{msg.senderName}</span>
@@ -549,7 +558,7 @@ export const ChatView = () => {
 
                           {/* Voice Message Player Layout */}
                           {msg.type === 'voice' ? (
-                            <div className="space-y-2 min-w-[220px]">
+                            <div className="space-y-2 min-w-0 w-full sm:min-w-[220px]">
                               <div className="flex items-center space-x-3">
                                 <button
                                   onClick={() => toggleAudio(msg)}
@@ -600,7 +609,7 @@ export const ChatView = () => {
                             </div>
                           ) : msg.type === 'poll' ? (
                             /* Poll Layout */
-                            <div className="space-y-3 min-w-[240px]">
+                            <div className="space-y-3 min-w-0 w-full sm:min-w-[220px]">
                               <p className="font-bold">{msg.question || msg.text}</p>
                               <div className="space-y-2">
                                 {(msg.options || []).map((opt) => {
@@ -632,24 +641,6 @@ export const ChatView = () => {
                             msg.type !== 'image' && <p>{msg.text}</p>
                           )}
 
-                          {/* Translation Toggle */}
-                          {msg.text && msg.type !== 'poll' && (
-                            <div className="mt-2 pt-1.5 border-t border-current/10">
-                              <button
-                                onClick={() => handleTranslateMessage(msg)}
-                                className="text-[10px] font-semibold flex items-center space-x-1 opacity-80 hover:opacity-100"
-                              >
-                                <Globe size={11} />
-                                <span>{showTranslation[msg.id] ? 'Hide Translation' : 'Translate'}</span>
-                              </button>
-                              {showTranslation[msg.id] && (
-                                <p className="text-xs font-medium mt-1 opacity-95 italic">
-                                  {msg.translation || `[Translated]: "${msg.text}"`}
-                                </p>
-                              )}
-                            </div>
-                          )}
-
                           <div className="flex items-center justify-between space-x-2 mt-1">
                             {/* Render Reactions */}
                             {Array.isArray(msg.reactions) && msg.reactions.length > 0 ? (
@@ -669,7 +660,7 @@ export const ChatView = () => {
                         </div>
 
                         {/* Action icons on hover */}
-                        <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity px-1">
+                        <div className={`flex items-center space-x-2 w-full md:w-auto opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity px-1 ${isMe ? 'justify-end' : 'justify-start'}`}>
                           {['❤️', '🔥', '😂', '👍'].map((emoji) => (
                             <button
                               key={emoji}
@@ -754,7 +745,7 @@ export const ChatView = () => {
                     type="text"
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
-                    placeholder={isUploadingMedia ? 'Uploading photo...' : 'Type a vibe or message...'}
+                    placeholder={isUploadingMedia ? 'Uploading media...' : 'Type a vibe or message...'}
                     disabled={isUploadingMedia}
                     className="w-full bg-transparent text-sm text-slate-900 dark:text-white focus:outline-none"
                   />

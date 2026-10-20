@@ -5,22 +5,27 @@ import { useData } from '../../contexts/useData';
 
 export const ActiveCallOverlay = () => {
   const { activeCall, setActiveCall, showToast } = useData();
+  if (!activeCall) return null;
+
+  return (
+    <ActiveCallSession
+      key={`${activeCall.user?.id || 'call'}:${activeCall.type || 'voice'}`}
+      activeCall={activeCall}
+      setActiveCall={setActiveCall}
+      showToast={showToast}
+    />
+  );
+};
+
+function ActiveCallSession({ activeCall, setActiveCall, showToast }) {
   const [isMuted, setIsMuted] = useState(false);
   const [isCameraOff, setIsCameraOff] = useState(false);
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
-    if (!activeCall) {
-      setSeconds(0);
-      setIsMuted(false);
-      setIsCameraOff(false);
-      return undefined;
-    }
     const timer = window.setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => window.clearInterval(timer);
-  }, [activeCall]);
-
-  if (!activeCall) return null;
+  }, []);
 
   const formattedTime = `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
 

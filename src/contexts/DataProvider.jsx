@@ -37,6 +37,7 @@ import {
   sendConnectionRequest as sendFirestoreConnectionRequest,
   startOrOpenDirectChat as startOrOpenFirestoreDirectChat,
   subscribeToChats,
+  subscribeToChatMessages,
   subscribeToNotifications,
   syncSavedMessagesToFirestore,
   toggleChatDisappearing as toggleFirestoreChatDisappearing,
@@ -141,6 +142,12 @@ export function DataProvider({ children }) {
     }
   }, [userId]);
 
+  const watchChatMessages = useCallback((chatId) => subscribeToChatMessages(chatId, (messages) => {
+    setChats((current) => current.map((chat) => (
+      chat.id === chatId ? { ...chat, messages } : chat
+    )));
+  }), []);
+
   useEffect(() => {
     if (!userId) {
       setChats([]);
@@ -199,13 +206,9 @@ export function DataProvider({ children }) {
   const chatIdsKey = chats.map((chat) => chat.id).join('|');
   useEffect(() => {
     if (!userId || !chatIdsKey) return undefined;
-    const pollMessages = async () => {
-      const chatIds = chatIdsKey.split('|').filter(Boolean);
-      await Promise.all(chatIds.map((chatId) => refreshChatMessages(chatId).catch(() => {})));
-    };
-    pollMessages();
-    const interval = window.setInterval(pollMessages, 4000);
-    return () => window.clearInterval(interval);
+    const chatIds = chatIdsKey.split('|').filter(Boolean);
+    Promise.all(chatIds.map((chatId) => refreshChatMessages(chatId).catch(() => {})));
+    return undefined;
   }, [userId, chatIdsKey, refreshChatMessages]);
 
   useEffect(() => {
@@ -608,6 +611,7 @@ export function DataProvider({ children }) {
     refreshConnections,
     refreshNotifications,
     refreshChatMessages,
+    watchChatMessages,
   }), [
     chats,
     stories,
@@ -665,6 +669,7 @@ export function DataProvider({ children }) {
     refreshConnections,
     refreshNotifications,
     refreshChatMessages,
+    watchChatMessages,
   ]);
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

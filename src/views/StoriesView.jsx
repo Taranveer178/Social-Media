@@ -23,7 +23,7 @@ export const StoriesView = () => {
     showToast,
   } = useData();
   const { navigate, routeParams } = useContext(RouterContext);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(null);
   const [showCreate, setShowCreate] = useState(Boolean(routeParams.create));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -31,13 +31,10 @@ export const StoriesView = () => {
   const [replyText, setReplyText] = useState('');
   const [isSendingReply, setIsSendingReply] = useState(false);
 
-  useEffect(() => {
-    if (routeParams.storyId) {
-      const idx = stories.findIndex((story) => story.id === routeParams.storyId);
-      if (idx >= 0) setCurrentIndex(idx);
-    }
-  }, [routeParams.storyId, stories]);
-
+  const routeStoryIndex = routeParams.storyId
+    ? stories.findIndex((story) => story.id === routeParams.storyId)
+    : -1;
+  const currentIndex = selectedIndex ?? (routeStoryIndex >= 0 ? routeStoryIndex : 0);
   const safeIndex = Math.min(Math.max(0, currentIndex), Math.max(0, stories.length - 1));
   const activeStory = stories[safeIndex] || null;
   const storyAuthor = activeStory?.author
@@ -70,7 +67,7 @@ export const StoriesView = () => {
       });
       setShowCreate(false);
       setSelectedImage(null);
-      setCurrentIndex(0);
+      setSelectedIndex(0);
     } catch (error) {
       setSubmitError(error.message);
     } finally {
@@ -102,7 +99,7 @@ export const StoriesView = () => {
   }
 
   return (
-    <div className="flex-1 h-screen bg-black flex items-center justify-center relative p-4">
+    <div className="flex-1 h-full min-h-0 bg-black flex items-center justify-center relative p-4 pb-20 md:pb-4">
       <div className="absolute top-5 right-5 flex items-center gap-2 z-30">
         <button
           onClick={() => setShowCreate(true)}
@@ -136,7 +133,7 @@ export const StoriesView = () => {
                   <button
                     key={story.id}
                     type="button"
-                    onClick={() => setCurrentIndex(index)}
+                    onClick={() => setSelectedIndex(index)}
                     className="flex-1 h-1 bg-white/30 rounded-full overflow-hidden cursor-pointer"
                   >
                     <div className={`h-full bg-white transition-all duration-300 ${index <= safeIndex ? 'w-full' : 'w-0'}`}></div>
@@ -178,7 +175,7 @@ export const StoriesView = () => {
               <button
                 type="button"
                 disabled={safeIndex === 0}
-                onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
+                onClick={() => setSelectedIndex((i) => Math.max(0, (i ?? currentIndex) - 1))}
                 className="pointer-events-auto p-2 rounded-full bg-black/40 text-white hover:bg-black/60 disabled:opacity-20"
               >
                 <ChevronLeft size={20} />
@@ -186,7 +183,7 @@ export const StoriesView = () => {
               <button
                 type="button"
                 disabled={safeIndex >= stories.length - 1}
-                onClick={() => setCurrentIndex((i) => Math.min(stories.length - 1, i + 1))}
+                onClick={() => setSelectedIndex((i) => Math.min(stories.length - 1, (i ?? currentIndex) + 1))}
                 className="pointer-events-auto p-2 rounded-full bg-black/40 text-white hover:bg-black/60 disabled:opacity-20"
               >
                 <ChevronRight size={20} />

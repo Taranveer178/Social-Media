@@ -36,7 +36,6 @@ export const DEFAULT_USER_SETTINGS = {
   },
   storage: {
     autoTranscripts: true,
-    autoTranslate: true,
     highQualityMedia: true,
   },
 };

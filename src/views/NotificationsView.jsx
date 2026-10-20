@@ -25,7 +25,7 @@ export function NotificationsView() {
   return (
     <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-900 pb-24 md:pb-8">
       <div className="max-w-4xl mx-auto p-4 md:p-8">
-        <header className="flex items-center justify-between mb-6">
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
           <div className="flex items-center space-x-3">
             <div className="w-11 h-11 rounded-2xl bg-violet-100 dark:bg-violet-950/50 flex items-center justify-center text-violet-600 dark:text-violet-300">
               <Bell size={22} />
@@ -36,7 +36,7 @@ export function NotificationsView() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 self-start sm:self-auto">
             <button
               onClick={() => markAllNotificationsRead()}
               className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:border-violet-200 dark:hover:border-violet-700 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"

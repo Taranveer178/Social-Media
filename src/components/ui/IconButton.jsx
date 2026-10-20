@@ -1,7 +1,8 @@
 
 
-export const IconButton = ({ icon: Icon, onClick, active, badge, className = '', title }) => (
+export const IconButton = ({ icon: Icon, onClick, active, badge, className = '', title, type = 'button' }) => (
   <button 
+    type={type}
     onClick={onClick}
     title={title}
     className={`relative p-2.5 rounded-2xl transition-all duration-200 active:scale-95

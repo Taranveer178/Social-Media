@@ -351,7 +351,7 @@ export const SettingsView = () => {
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white">Storage & Data</h3>
-                  <p className="text-xs text-slate-400">AI voice transcripts, translations, and media quality</p>
+                  <p className="text-xs text-slate-400">Voice transcripts and media quality</p>
                 </div>
               </div>
               <ChevronDown size={18} className={`text-slate-400 transition-transform ${openSection === 'storage' ? 'rotate-180' : ''}`} />
@@ -360,7 +360,6 @@ export const SettingsView = () => {
               <div className="px-5 pb-5 pt-2 space-y-3 bg-slate-50/50 dark:bg-slate-900/30">
                 {[
                   { key: 'autoTranscripts', label: 'AI Voice Transcripts', desc: 'Automatically transcribe voice notes in chats' },
-                  { key: 'autoTranslate', label: 'Instant Message Translation', desc: 'Enable 1-click translation on chat messages' },
                   { key: 'highQualityMedia', label: 'High-Resolution Media Uploads', desc: 'Upload full-clarity images to Firebase Storage / Cloudinary' },
                 ].map((item) => {
                   const enabled = currentSettings.storage?.[item.key] !== false;

@@ -78,7 +78,7 @@ export async function uploadMedia(file, mediaType = 'image') {
   // 1. Primary: Firebase Cloud Storage
   try {
     const extension = mediaType === 'audio'
-      ? 'webm'
+      ? file.type.includes('mp4') ? 'm4a' : file.type.includes('ogg') ? 'ogg' : 'webm'
       : file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
     const fileName = `${crypto.randomUUID()}.${extension}`;
     const mediaRef = ref(storage, `users/${user.uid}/media/${fileName}`);
@@ -86,11 +86,16 @@ export async function uploadMedia(file, mediaType = 'image') {
       contentType: file.type || (mediaType === 'audio' ? 'audio/webm' : 'image/jpeg'),
     });
     return await getDownloadURL(mediaRef);
-  } catch {
+  } catch (storageError) {
     // 2. Fallback: Cloudinary unsigned upload
     try {
       return await uploadToCloudinary(file);
-    } catch {
+    } catch (cloudinaryError) {
+      if (mediaType === 'audio') {
+        throw new Error(`Voice upload failed: ${cloudinaryError.message || storageError.message}`, {
+          cause: cloudinaryError,
+        });
+      }
       // 3. Final fallback: Compressed Data URL for Firestore persistence
       return await fileToCompressedDataUrl(file);
     }
