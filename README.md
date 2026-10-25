@@ -1,6 +1,6 @@
 # Vibely — Full-Stack Firebase + Cloudflare Pages Social App
 
-Vibely is a React 19 + Vite + Tailwind CSS v4 social application connected end-to-end to **Firebase Authentication**, **Cloud Firestore**, and **Firebase Storage** (with **Cloudinary** and client-side compressed Data URL fallbacks), pre-configured for **Cloudflare Pages** hosting.
+Vibely is a React 19 + Vite + Tailwind CSS v4 social application connected end-to-end to **Firebase Authentication**, **Cloud Firestore**, **Cloudinary** media uploads, and **Firebase Storage** as a fallback, pre-configured for **Cloudflare Pages** hosting.
 
 ## Connected Features & Firestore Collections
 
@@ -30,7 +30,8 @@ Vibely is a React 19 + Vite + Tailwind CSS v4 social application connected end-t
 1. In the [Firebase Console](https://console.firebase.google.com/), open project **`vibely-1d289`**.
 2. **Authentication**: Go to **Build → Authentication → Sign-in method** and enable **Email/Password**. Also add your Cloudflare Pages domain (e.g. `vibely.pages.dev`) under **Authentication → Settings → Authorized domains**.
 3. **Cloud Firestore**: Go to **Build → Firestore Database → Rules** and paste the contents of `firestore.rules` (or run `npx firebase deploy --only firestore`), then click **Publish**.
-4. **Storage**: Go to **Build → Storage → Rules** and paste the contents of `storage.rules` (or run `npx firebase deploy --only storage`). If Firebase Storage is not enabled on your plan, Vibely automatically falls back to Cloudinary (`src/cloudinaryConfig.js`) and compressed Data URLs so uploads still work out of the box.
+4. **Cloudinary uploads**: In the Cloudinary Console, open **Settings → Upload → Upload presets**, create an **unsigned** upload preset named `Vibely App`, and make sure it allows the media types your app will upload. The app is configured for cloud name `noyknekj` and uses this preset as its primary upload service. You can override these defaults with `VITE_CLOUDINARY_CLOUD_NAME` and `VITE_CLOUDINARY_UPLOAD_PRESET` environment variables.
+5. **Firebase Storage fallback**: Go to **Build → Storage → Rules** and paste the contents of `storage.rules` (or run `npx firebase deploy --only storage`). Firebase Storage is used if a Cloudinary upload fails; images also retain the existing compressed Data URL fallback.
 
 ## 2. Cloudflare Pages Deployment
 

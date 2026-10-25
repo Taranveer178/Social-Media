@@ -58,10 +58,10 @@ async function uploadToCloudinary(file) {
     method: 'POST',
     body: formData,
   });
-  if (!response.ok) {
-    throw new Error('Cloudinary upload failed.');
-  }
   const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error?.message || `Cloudinary upload failed (${response.status}).`);
+  }
   if (!data.secure_url) {
     throw new Error('Cloudinary did not return a URL.');
   }
@@ -75,25 +75,25 @@ export async function uploadMedia(file, mediaType = 'image') {
     throw new TypeError('Media uploads require a File or Blob.');
   }
 
-  // 1. Primary: Firebase Cloud Storage
+  // 1. Primary: Cloudinary unsigned upload
   try {
-    const extension = mediaType === 'audio'
-      ? file.type.includes('mp4') ? 'm4a' : file.type.includes('ogg') ? 'ogg' : 'webm'
-      : file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
-    const fileName = `${crypto.randomUUID()}.${extension}`;
-    const mediaRef = ref(storage, `users/${user.uid}/media/${fileName}`);
-    await uploadBytes(mediaRef, file, {
-      contentType: file.type || (mediaType === 'audio' ? 'audio/webm' : 'image/jpeg'),
-    });
-    return await getDownloadURL(mediaRef);
-  } catch (storageError) {
-    // 2. Fallback: Cloudinary unsigned upload
+    return await uploadToCloudinary(file);
+  } catch (cloudinaryError) {
+    // 2. Fallback: Firebase Cloud Storage
     try {
-      return await uploadToCloudinary(file);
-    } catch (cloudinaryError) {
+      const extension = mediaType === 'audio'
+        ? file.type.includes('mp4') ? 'm4a' : file.type.includes('ogg') ? 'ogg' : 'webm'
+        : file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+      const fileName = `${crypto.randomUUID()}.${extension}`;
+      const mediaRef = ref(storage, `users/${user.uid}/media/${fileName}`);
+      await uploadBytes(mediaRef, file, {
+        contentType: file.type || (mediaType === 'audio' ? 'audio/webm' : 'image/jpeg'),
+      });
+      return await getDownloadURL(mediaRef);
+    } catch (storageError) {
       if (mediaType === 'audio') {
-        throw new Error(`Voice upload failed: ${cloudinaryError.message || storageError.message}`, {
-          cause: cloudinaryError,
+        throw new Error(`Voice upload failed. Cloudinary: ${cloudinaryError.message} Firebase Storage: ${storageError.message}`, {
+          cause: storageError,
         });
       }
       // 3. Final fallback: Compressed Data URL for Firestore persistence
