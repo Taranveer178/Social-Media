@@ -74,6 +74,9 @@ export async function uploadMedia(file, mediaType = 'image') {
   if (!(file instanceof Blob)) {
     throw new TypeError('Media uploads require a File or Blob.');
   }
+  if (mediaType === 'video' && !file.type.startsWith('video/')) {
+    throw new TypeError('Choose a video file to create a Reel.');
+  }
 
   // 1. Primary: Cloudinary unsigned upload
   try {
@@ -83,16 +86,19 @@ export async function uploadMedia(file, mediaType = 'image') {
     try {
       const extension = mediaType === 'audio'
         ? file.type.includes('mp4') ? 'm4a' : file.type.includes('ogg') ? 'ogg' : 'webm'
+        : mediaType === 'video'
+          ? file.type.includes('webm') ? 'webm' : file.type.includes('quicktime') ? 'mov' : file.type.includes('ogg') ? 'ogv' : 'mp4'
         : file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
       const fileName = `${crypto.randomUUID()}.${extension}`;
       const mediaRef = ref(storage, `users/${user.uid}/media/${fileName}`);
       await uploadBytes(mediaRef, file, {
-        contentType: file.type || (mediaType === 'audio' ? 'audio/webm' : 'image/jpeg'),
+        contentType: file.type || (mediaType === 'audio' ? 'audio/webm' : mediaType === 'video' ? 'video/mp4' : 'image/jpeg'),
       });
       return await getDownloadURL(mediaRef);
     } catch (storageError) {
-      if (mediaType === 'audio') {
-        throw new Error(`Voice upload failed. Cloudinary: ${cloudinaryError.message} Firebase Storage: ${storageError.message}`, {
+      if (mediaType === 'audio' || mediaType === 'video') {
+        const label = mediaType === 'audio' ? 'Voice' : 'Video';
+        throw new Error(`${label} upload failed. Cloudinary: ${cloudinaryError.message} Firebase Storage: ${storageError.message}`, {
           cause: storageError,
         });
       }

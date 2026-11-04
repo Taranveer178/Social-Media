@@ -3,6 +3,7 @@ import {
   Flag,
   Heart,
   Image as ImageIcon,
+  Clapperboard,
   MessageCircle,
   Plus,
   Send,
@@ -34,8 +35,9 @@ export const MomentsView = () => {
   const { routeParams } = useContext(RouterContext);
 
   const [selectedCircleFilter, setSelectedCircleFilter] = useState(routeParams.circleId || 'all');
-  const [showCreate, setShowCreate] = useState(Boolean(routeParams.circleId));
+  const [showCreate, setShowCreate] = useState(Boolean(routeParams.circleId || routeParams.create));
   const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedMediaType, setSelectedMediaType] = useState(routeParams.mediaType === 'video' ? 'video' : 'image');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [openCommentsId, setOpenCommentsId] = useState(null);
@@ -49,7 +51,7 @@ export const MomentsView = () => {
   async function handleCreate(event) {
     event.preventDefault();
     if (!selectedImage) {
-      setSubmitError('Choose an image for your moment.');
+      setSubmitError(`Choose a ${selectedMediaType === 'video' ? 'video' : 'photo'} for your post.`);
       return;
     }
     const form = new FormData(event.currentTarget);
@@ -58,9 +60,11 @@ export const MomentsView = () => {
     setIsSubmitting(true);
     setSubmitError('');
     try {
-      const image = await uploadMedia(selectedImage);
+      const mediaUrl = await uploadMedia(selectedImage, selectedMediaType);
       await createMoment({
-        image,
+        image: selectedMediaType === 'image' ? mediaUrl : '',
+        mediaUrl: selectedMediaType === 'video' ? mediaUrl : '',
+        mediaType: selectedMediaType,
         title: form.get('title'),
         location: form.get('location') || 'Vibely Community',
         circleId,
@@ -198,7 +202,18 @@ export const MomentsView = () => {
                       </div>
                     </div>
 
-                    <img src={moment.image || moment.imageUrl} className="w-full h-80 object-cover" alt="Moment" />
+                    {moment.mediaType === 'video' || moment.type === 'reel' ? (
+                      <video
+                        src={moment.mediaUrl || moment.image || moment.imageUrl}
+                        controls
+                        playsInline
+                        preload="metadata"
+                        className="mx-auto max-h-[75vh] w-full bg-black object-contain"
+                        aria-label={moment.title || 'Reel'}
+                      />
+                    ) : (
+                      <img src={moment.image || moment.imageUrl} className="aspect-[4/5] w-full object-cover" alt="Moment" />
+                    )}
 
                     <div className="p-4 space-y-3">
                       <h4 className="text-sm font-bold text-slate-900 dark:text-white">{moment.title}</h4>
@@ -272,15 +287,52 @@ export const MomentsView = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <form onSubmit={handleCreate} className="bg-white dark:bg-slate-950 max-w-md w-full p-6 rounded-3xl space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Create Moment</h2>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                {selectedMediaType === 'video' ? 'Create a Reel' : 'Create a post'}
+              </h2>
               <button type="button" onClick={() => setShowCreate(false)} aria-label="Close"><X size={20} /></button>
             </div>
-            <label className="flex items-center gap-2 text-sm text-slate-500 cursor-pointer p-3 rounded-2xl bg-slate-100 dark:bg-slate-900">
-              <ImageIcon size={18} className="text-violet-600" />
-              <span className="truncate">{selectedImage?.name || 'Choose an image'}</span>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedMediaType('image');
+                  setSelectedImage(null);
+                }}
+                aria-pressed={selectedMediaType === 'image'}
+                className={`rounded-xl border px-3 py-2 text-sm font-semibold ${
+                  selectedMediaType === 'image'
+                    ? 'border-violet-600 bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300'
+                    : 'border-slate-200 text-slate-500 dark:border-slate-800'
+                }`}
+              >
+                Photo post
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedMediaType('video');
+                  setSelectedImage(null);
+                }}
+                aria-pressed={selectedMediaType === 'video'}
+                className={`rounded-xl border px-3 py-2 text-sm font-semibold ${
+                  selectedMediaType === 'video'
+                    ? 'border-violet-600 bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300'
+                    : 'border-slate-200 text-slate-500 dark:border-slate-800'
+                }`}
+              >
+                Reel
+              </button>
+            </div>
+            <label className="flex cursor-pointer items-center gap-2 rounded-2xl bg-slate-100 p-3 text-sm text-slate-500 dark:bg-slate-900">
+              {selectedMediaType === 'video'
+                ? <Clapperboard size={18} className="text-violet-600" />
+                : <ImageIcon size={18} className="text-violet-600" />}
+              <span className="truncate">{selectedImage?.name || `Choose a ${selectedMediaType === 'video' ? 'video' : 'photo'}`}</span>
               <input
+                key={selectedMediaType}
                 type="file"
-                accept="image/*"
+                accept={selectedMediaType === 'video' ? 'video/*' : 'image/*'}
                 required
                 className="sr-only"
                 onChange={(event) => setSelectedImage(event.target.files?.[0] || null)}
@@ -289,7 +341,7 @@ export const MomentsView = () => {
             <input
               name="title"
               required
-              placeholder="Moment caption or title"
+              placeholder="Write a caption..."
               className="w-full bg-slate-100 dark:bg-slate-900 p-3 rounded-2xl text-sm text-slate-900 dark:text-white"
             />
             <input
@@ -312,7 +364,7 @@ export const MomentsView = () => {
               disabled={isSubmitting}
               className="w-full bg-violet-600 disabled:opacity-60 text-white p-3 rounded-2xl text-sm font-bold"
             >
-              {isSubmitting ? 'Uploading...' : 'Share Moment'}
+              {isSubmitting ? 'Uploading...' : selectedMediaType === 'video' ? 'Share Reel' : 'Share Post'}
             </button>
           </form>
         </div>
