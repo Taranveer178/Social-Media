@@ -91,7 +91,30 @@ export const DashboardView = () => {
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-[1080px] grid-cols-1 gap-10 px-0 py-0 md:px-8 md:py-8 lg:grid-cols-[minmax(0,630px)_minmax(260px,320px)]">
+      <div className="mx-auto grid max-w-[1160px] grid-cols-1 gap-8 px-0 py-0 md:px-8 md:py-7 lg:grid-cols-[minmax(0,1fr)_minmax(240px,300px)] lg:gap-10 xl:gap-14">
+        <header className="col-span-1 hidden items-center justify-between gap-6 md:flex lg:col-span-2">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-600 dark:text-violet-400">Your community</p>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight">Home feed</h1>
+          </div>
+          <button
+            onClick={() => navigate('/discover')}
+            className="flex w-full max-w-[340px] items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-left text-sm text-slate-400 transition hover:border-violet-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-violet-800"
+          >
+            <Search size={17} />
+            <span>Search people and posts</span>
+          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            <IconButton icon={Bell} badge={unreadNotificationsCount > 0} onClick={() => navigate('/notifications')} title="Notifications" />
+            <button
+              onClick={() => navigate('/moments', { create: true })}
+              className="flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-700"
+            >
+              <Plus size={17} /> Create
+            </button>
+          </div>
+        </header>
+
         <div className="min-w-0">
           {users.length === 0 && stories.length === 0 && moments.length === 0 && (
             <section className="m-4 flex flex-col gap-4 rounded-2xl border border-violet-200 bg-white p-5 shadow-sm dark:border-violet-900 dark:bg-slate-900 sm:flex-row sm:items-center sm:justify-between md:m-0 md:mb-6">
@@ -315,8 +338,8 @@ export const DashboardView = () => {
           </FetchState>
         </div>
 
-        <aside className="hidden lg:block">
-          <div className="sticky top-8 space-y-5">
+        <aside className="hidden min-w-0 lg:block">
+          <div className="sticky top-7 space-y-6">
             <div className="flex items-center gap-3">
               <Avatar src={user?.avatar} name={user?.name} />
               <div className="min-w-0 flex-1">
@@ -353,16 +376,6 @@ export const DashboardView = () => {
         </aside>
       </div>
 
-      <div className="fixed right-5 top-5 z-20 hidden md:flex items-center gap-2">
-        <IconButton icon={Search} onClick={() => navigate('/discover')} title="Discover" />
-        <IconButton icon={Bell} badge={unreadNotificationsCount > 0} onClick={() => navigate('/notifications')} title="Notifications" />
-        <button
-          onClick={() => navigate('/moments', { create: true })}
-          className="flex items-center gap-2 rounded-full bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-900/10 transition hover:bg-violet-700"
-        >
-          <Plus size={17} /> Create
-        </button>
-      </div>
     </main>
   );
 };
