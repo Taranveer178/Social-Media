@@ -1138,15 +1138,15 @@ export async function seedDemoCommunityData(currentUser) {
     createdAt: serverTimestamp(),
   }, { merge: true });
 
-  // Create an incoming connection request so user can test accepting it
-  const connRef = doc(db, 'connections', `demo_maya_lin_${currentUser.id}`);
+  // Seed a request from the signed-in user; Firestore does not allow impersonating Maya.
+  const connRef = doc(db, 'connections', `${currentUser.id}_demo_maya_lin`);
   batch.set(connRef, {
-    senderId: 'demo_maya_lin',
-    senderName: 'Maya Lin',
-    senderAvatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Maya',
-    recipientId: currentUser.id,
-    recipientName: currentUser.name || 'You',
-    recipientAvatar: currentUser.avatar || '',
+    senderId: currentUser.id,
+    senderName: currentUser.name || 'You',
+    senderAvatar: currentUser.avatar || '',
+    recipientId: 'demo_maya_lin',
+    recipientName: 'Maya Lin',
+    recipientAvatar: 'https://api.dicebear.com/9.x/avataaars/svg?seed=Maya',
     status: 'pending',
     createdAt: serverTimestamp(),
   }, { merge: true });

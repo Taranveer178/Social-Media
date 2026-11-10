@@ -93,7 +93,7 @@ export const DashboardView = () => {
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-[1160px] grid-cols-1 gap-8 px-0 py-0 md:px-8 md:py-7 lg:grid-cols-[minmax(0,1fr)_minmax(240px,300px)] lg:gap-10 xl:gap-14">
+      <div className="mx-auto grid max-w-[1160px] grid-cols-1 gap-8 px-0 py-0 md:px-8 md:py-7 lg:grid-cols-[minmax(0,470px)_300px] lg:justify-center lg:gap-16">
         <header className="col-span-1 hidden items-center justify-between gap-6 md:flex lg:col-span-2">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-600 dark:text-violet-400">Your community</p>
@@ -239,11 +239,11 @@ export const DashboardView = () => {
                         activeFeed === 'reels' ? 'mx-auto max-w-[440px]' : ''
                       }`}
                     >
-                      <header className="flex items-center justify-between px-3 py-3 md:px-4">
+                      <header className="flex items-center justify-between px-3 py-3.5 md:px-4">
                         <div className="flex min-w-0 items-center gap-3 text-left">
                           <Avatar src={author?.avatar || moment.authorAvatar} name={author?.name || moment.authorName} size="sm" />
                           <span className="min-w-0">
-                            <span className="block truncate text-[13px] font-semibold">
+                            <span className="block truncate text-[13px] font-semibold tracking-tight">
                               {author?.username || author?.name || moment.authorName || 'Vibely User'}
                             </span>
                             <span className="block truncate text-[11px] text-slate-500 dark:text-slate-400">
@@ -271,25 +271,25 @@ export const DashboardView = () => {
                         />
                       )}
 
-                      <div className="px-3 pb-3 pt-2 md:px-4">
+                      <div className="px-3 pb-4 pt-2 md:px-4">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-3">
                             <button
                               onClick={() => toggleMomentLike(moment.id).catch((error) => showToast(error.message))}
                               aria-label={moment.isLiked ? 'Unlike post' : 'Like post'}
-                              className={`transition active:scale-90 ${moment.isLiked ? 'text-rose-500' : 'hover:text-slate-500'}`}
+                              className={`rounded-full p-1 transition active:scale-90 ${moment.isLiked ? 'text-rose-500' : 'hover:text-rose-500'}`}
                             >
-                              <Heart size={25} strokeWidth={1.8} className={moment.isLiked ? 'fill-rose-500' : ''} />
+                              <Heart size={24} strokeWidth={1.8} className={moment.isLiked ? 'fill-rose-500' : ''} />
                             </button>
                             <button
                               onClick={() => setOpenCommentsId(isCommentsOpen ? null : moment.id)}
                               aria-label="Show comments"
-                              className="transition hover:text-slate-500"
+                              className="rounded-full p-1 transition hover:text-slate-500"
                             >
-                              <MessageCircle size={24} strokeWidth={1.8} />
+                              <MessageCircle size={23} strokeWidth={1.8} />
                             </button>
-                            <button onClick={() => handleShare(moment)} aria-label="Share post" className="transition hover:text-slate-500">
-                              <Send size={23} strokeWidth={1.8} />
+                            <button onClick={() => handleShare(moment)} aria-label="Share post" className="rounded-full p-1 transition hover:text-slate-500">
+                              <Send size={22} strokeWidth={1.8} />
                             </button>
                           </div>
                         </div>

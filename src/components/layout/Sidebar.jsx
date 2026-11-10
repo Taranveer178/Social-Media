@@ -62,7 +62,7 @@ export const Sidebar = () => {
               onClick={() => navigate(item.id)}
               className={`w-full flex items-center p-3 rounded-xl transition-colors duration-150 group
                 ${isActive
-                  ? 'bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-400 font-semibold'
+                  ? 'bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-400 font-semibold'
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-slate-100'
                 }
               `}
