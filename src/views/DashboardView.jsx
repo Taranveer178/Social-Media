@@ -17,6 +17,7 @@ import { Avatar } from '../components/ui/Avatar';
 import { StoryRing } from '../components/ui/StoryRing';
 import { IconButton } from '../components/ui/IconButton';
 import { FetchState } from '../components/ui/FetchState';
+import { BrandMark } from '../components/ui/BrandMark';
 
 export const DashboardView = () => {
   const {
@@ -81,7 +82,8 @@ export const DashboardView = () => {
   return (
     <main className="flex-1 min-w-0 overflow-y-auto bg-[#fafafa] text-slate-950 dark:bg-slate-950 dark:text-slate-100 pb-24 md:pb-8">
       <header className="sticky top-0 z-30 flex items-center justify-between border-b border-slate-200/80 bg-white/95 px-4 py-3 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/95 md:hidden">
-        <button onClick={() => navigate('/')} className="font-serif text-[26px] font-bold tracking-tight" aria-label="Vibely home">
+        <button onClick={() => navigate('/')} className="flex items-center gap-2.5 font-serif text-[24px] font-bold tracking-tight" aria-label="Vibely home">
+          <BrandMark size="sm" />
           vibely
         </button>
         <div className="flex items-center gap-1">

@@ -1,5 +1,4 @@
 import {
-  Activity,
   Bell,
   Bookmark,
   Globe,
@@ -18,6 +17,7 @@ import { useData } from '../../contexts/useData';
 import { useRouter } from '../../contexts/useRouter';
 import { useTheme } from '../../contexts/useTheme';
 import { Avatar } from '../ui/Avatar';
+import { BrandMark } from '../ui/BrandMark';
 
 export const Sidebar = () => {
   const { currentRoute, navigate } = useRouter();
@@ -43,9 +43,7 @@ export const Sidebar = () => {
   return (
     <aside className="hidden md:flex flex-col w-20 lg:w-64 h-screen bg-white dark:bg-slate-950 border-r border-slate-200/80 dark:border-slate-800/80 transition-all duration-300 z-20 shrink-0">
       <div className="p-4 flex items-center justify-center lg:justify-start space-x-3 my-2 cursor-pointer" onClick={() => navigate('/')}>
-        <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center">
-          <Activity className="text-white" size={22} />
-        </div>
+        <BrandMark />
         <div className="hidden lg:block">
           <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
             Vibely

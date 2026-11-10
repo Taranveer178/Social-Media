@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Activity, Eye, EyeOff, Image as ImageIcon, LoaderCircle, LogIn, UserPlus } from 'lucide-react';
+import { Eye, EyeOff, Image as ImageIcon, LoaderCircle, LogIn, UserPlus } from 'lucide-react';
 import { useAuth } from '../contexts/useAuth';
+import { BrandMark } from '../components/ui/BrandMark';
 
 export function AuthView({ initialError = '' }) {
   const { login, register, sendPasswordReset } = useAuth();
@@ -49,9 +50,7 @@ export function AuthView({ initialError = '' }) {
     <main className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4">
       <section className="w-full max-w-md bg-white dark:bg-slate-950 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-xl p-7 md:p-9">
         <div className="flex items-center gap-3 mb-7">
-          <div className="w-11 h-11 bg-green-600 rounded-xl flex items-center justify-center">
-            <Activity className="text-white" size={23} />
-          </div>
+          <BrandMark size="lg" />
           <div>
             <p className="text-xl font-bold text-slate-900 dark:text-white">Vibely</p>
             <p className="text-xs text-slate-400">Share your vibe</p>
